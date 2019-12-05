@@ -1,6 +1,7 @@
 #using duplicates
 
 import sys
+import math
 import pandas as pd
 import numpy as np
 
@@ -20,12 +21,32 @@ def fillMatrix(df, inputDf):
             df.loc[val2,val1] = 0
 
     outCounts = df.sum(axis=0) #counts outdegrees for each node, represented by the index of this array
-    #df = df.divide(outCounts, axis=0)
+    #df = df.divide(outCounts)
     df = df/outCounts
     df = df.fillna(0)
     df = df.replace(float("inf"),1)
-
     return df
+
+# O(jk) is all outbound edges from jk
+def pageRank(matrixDf, numNodes):
+    d = 0.85
+    e = 0.01
+    prefix = (1 - d) * 1/numNodes
+    ranks = []
+    prevRanks = np.full(numNodes, 1/numNodes)
+    diffs = 1
+
+    numIters = 0
+    while abs(diffs) > e:
+        temp = matrixDf.mul(prevRanks)
+        ranks = ((np.array(temp.sum(axis=1))) * d) + prefix
+        diffs = np.sum(ranks - prevRanks)
+
+        prevRanks = ranks
+        numIters += 1
+        print(diffs)
+
+    return numIters, ranks
 
 def main():
     infile = sys.argv[1]
@@ -42,9 +63,7 @@ def main():
     df = pd.DataFrame(filler, columns = uniqueVals, index = uniqueVals)
     matrixDf = fillMatrix(df, inputDf)
 
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    print(matrixDf)
+    numIters, ranks = pageRank(matrixDf, len(uniqueVals))
 
 if __name__ == '__main__':
     main()
