@@ -1,6 +1,7 @@
-import sys;
-import time;
-import numpy as np;
+import sys
+import time
+import math
+import numpy as np
 import pandas as pd
 
 
@@ -24,17 +25,25 @@ def getMatrix(labels, inputDf):
 # O(jk) is all outbound edges from jk
 def pageRank(matrixDf, numNodes):
     d = 0.85
+    e = 0.01
     prefix = (1 - d) * 1/numNodes
+    ranks = []
     prevRanks = np.full(numNodes, 1/numNodes)
-    temp = matrixDf.mul(prevRanks)
-    ranks = ((np.array(temp.sum(axis=1))) * d) + prefix
-    print(ranks)
+    diffs = 1
 
-    return 1, ranks
+    numIters = 0
+    while abs(diffs) > e:
+        temp = matrixDf.mul(prevRanks)
+        ranks = ((np.array(temp.sum(axis=1))) * d) + prefix
+        diffs = np.sum(ranks - prevRanks)
+
+        prevRanks = ranks
+        numIters += 1
+        print(diffs)
+
+    return numIters, ranks
 
 def main():
-    procTime = 0
-
     start = time.time()
     inputDf = pd.read_csv(sys.argv[1], skiprows=[0, 1, 2, 3], 
         delim_whitespace=True, header=None, names=["From", "To"])
@@ -47,7 +56,10 @@ def main():
     end = time.time()
     readTime = end - start
 
+    start = time.time()
     numIters, ranks = pageRank(matrixDf, numNodes)
+    end = time.time()
+    procTime = end - start
 
 
 
