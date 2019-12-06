@@ -13,10 +13,10 @@ def fillMatrix(matrixDf, inputDf):
     nonzeros = matrixDf.astype(bool).sum(axis=0)
     matrixDf = matrixDf / nonzeros
     print("removing nan")
-    matrixDf.fillna(0, inplace=True)
+    matrixDf.fillna(np.int8(0), inplace=True)
 
     print("about to replace infs")
-    matrixDf.replace(float("inf"), 1, inplace=True)
+    matrixDf.replace(float("inf"), np.int8(1), inplace=True)
     return matrixDf
 
 def getMatrix(labels, inputDf):
