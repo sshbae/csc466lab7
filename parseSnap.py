@@ -7,13 +7,16 @@ import pandas as pd
 
 def fillMatrix(matrixDf, inputDf):
     for index, row in inputDf.iterrows():
+        print(index)
         matrixDf.loc[row[1], row[0]] = 1
 
     nonzeros = matrixDf.astype(bool).sum(axis=0)
     matrixDf = matrixDf / nonzeros
-    matrixDf = matrixDf.fillna(0)
+    print("removing nan")
+    matrixDf = matrixDf.fillna(0, inplace=True)
 
-    return matrixDf.replace(float("inf"),1)
+    print("about to replace infs")
+    return matrixDf.replace(float("inf"), 1, inplace=True)
 
 def getMatrix(labels, inputDf):
     temp = np.zeros((labels.size, labels.size))
@@ -24,8 +27,9 @@ def getMatrix(labels, inputDf):
 
 # O(jk) is all outbound edges from jk
 def pageRank(matrixDf, numNodes):
-    d = 0.85
-    e = 0.01
+    print("working on ranking")
+    d = 0.90
+    e = 0.03
     prefix = (1 - d) * 1/numNodes
     ranks = []
     prevRanks = np.full(numNodes, 1/numNodes)
@@ -39,9 +43,17 @@ def pageRank(matrixDf, numNodes):
 
         prevRanks = ranks
         numIters += 1
-        print(diffs)
 
     return numIters, ranks
+
+def report(readTime, procTime, numIters, matrixDf, ranks):
+    with open("amazon.out", 'w') as f:
+        f.write(f"Read time:       {readTime}\n")
+        f.write(f"Iterations:      {numIters}\n")
+        f.write(f"Processing time: {procTime}\n")
+        f.write("    avg per node across all iterations\n")
+        for i in range(len(ranks)):
+            f.write(f"node: {matrixDf.index[i]} with pagerank: {ranks[i]}\n")
 
 def main():
     start = time.time()
@@ -61,6 +73,7 @@ def main():
     end = time.time()
     procTime = end - start
 
+    report(readTime, procTime / numNodes, numIters, matrixDf, ranks)
 
 
 if __name__ == '__main__':
