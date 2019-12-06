@@ -13,16 +13,17 @@ def fillMatrix(matrixDf, inputDf):
     nonzeros = matrixDf.astype(bool).sum(axis=0)
     matrixDf = matrixDf / nonzeros
     print("removing nan")
-    matrixDf = matrixDf.fillna(0, inplace=True)
+    matrixDf.fillna(0, inplace=True)
 
     print("about to replace infs")
-    return matrixDf.replace(float("inf"), 1, inplace=True)
+    matrixDf.replace(float("inf"), 1, inplace=True)
+    return matrixDf
 
 def getMatrix(labels, inputDf):
     temp = np.zeros((labels.size, labels.size))
     matrixDf = pd.DataFrame(data=temp, index=labels, columns=labels)
     matrixDf = fillMatrix(matrixDf, inputDf)
-   
+
     return matrixDf
 
 # O(jk) is all outbound edges from jk
