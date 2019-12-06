@@ -8,7 +8,7 @@ import pandas as pd
 def fillMatrix(matrixDf, inputDf):
     for index, row in inputDf.iterrows():
         print(index)
-        matrixDf.loc[row[1], row[0]] = 1
+        matrixDf.loc[row[1], row[0]] = np.int8(1)
 
     nonzeros = matrixDf.astype(bool).sum(axis=0)
     matrixDf = matrixDf / nonzeros
@@ -20,7 +20,7 @@ def fillMatrix(matrixDf, inputDf):
     return matrixDf
 
 def getMatrix(labels, inputDf):
-    temp = np.zeros((labels.size, labels.size))
+    temp = np.zeros((labels.size, labels.size), dtype = np.int8)
     matrixDf = pd.DataFrame(data=temp, index=labels, columns=labels)
     matrixDf = fillMatrix(matrixDf, inputDf)
 
