@@ -1,6 +1,7 @@
 #using duplicates
 
 import sys
+import time
 import math
 import pandas as pd
 import numpy as np
@@ -44,7 +45,6 @@ def pageRank(matrixDf, numNodes):
 
         prevRanks = ranks
         numIters += 1
-    #    print(diffs)
 
     return numIters, ranks
  
@@ -52,17 +52,14 @@ def displayRanks(ranks, uniqueVals):
     tupList = np.array([ranks, uniqueVals]).T
     np.set_printoptions(threshold=sys.maxsize)
     tupList = sorted(tupList, key=lambda tup: tup[0], reverse=True)
-    print(tupList)
-    #for i in range(len(ranks)):
-     #   print(f"{i+1} obj: {uniqueVals[i]} with pagerank: {ranks[i]}")
     for i in range(len(tupList)):
         
         print(f"{i+1} obj: {tupList[i][1]} with pagerank: {tupList[i][0]}") 
 
 def main():
-    infile = sys.argv[1]
+    start = time.time()
     nodeNames = {}
-    inputDf = pd.read_csv(infile, header=None, names= ["node1ID", "node1Val", "node2ID", "node2Val"])
+    inputDf = pd.read_csv(sys.argv[1], header=None, names= ["node1ID", "node1Val", "node2ID", "node2Val"])
     inputDf[["node1Val", "node2Val"]] = inputDf[["node1Val", "node2Val"]].apply(pd.to_numeric)
 
     uniqueVals = np.concatenate((pd.unique(inputDf["node1ID"]), pd.unique(inputDf["node2ID"])))
@@ -73,9 +70,16 @@ def main():
     filler = np.zeros((uniqueVals.size, uniqueVals.size))
     df = pd.DataFrame(filler, columns = uniqueVals, index = uniqueVals)
     matrixDf = fillMatrix(df, inputDf)
+    end = time.time()
+    readTime = end - start
 
+    start = time.time()
     numIters, ranks = pageRank(matrixDf, len(uniqueVals))
+    end = time.time()
+    procTime = end - start
+
     displayRanks(ranks, uniqueVals)
+    print(f"\nRead time: {readTime} sec\nProcessing time: {procTime} sec\nIterations: {numIters}")
 
 if __name__ == '__main__':
     main()
