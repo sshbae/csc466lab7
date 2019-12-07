@@ -1,3 +1,9 @@
+#CSC466 F19 Lab 7
+#Sarah Bae, shbae@calpoly.edu
+#Roxanne Miller, rmille60@calpoly.edu
+
+#parserSnap.py: python3 parserSnap.py <input txt file name>
+
 import sys
 import time
 import math
